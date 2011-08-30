@@ -21,14 +21,11 @@ runProg :: Stmt -> String
 runProg p = case runIM (exec p) initStore of
   Left e -> e
   Right ((),store) -> show $ Map.toAscList store
-fromMaybe :: String -> Maybe a -> Either String a
-fromMaybe s Nothing = Left s
-fromMaybe s (Just a) = Right a
   
 getVar :: String -> IM Val
 getVar v =  do
   r <- gets (Map.lookup v)
-  lift $ fromMaybe ("Undefined var "++v) r
+  maybe (throwError $ "Undefined var "++v) return r
   
 eval :: Exp -> IM Val
 eval (EInt i) = return i
