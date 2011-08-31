@@ -2,6 +2,8 @@ module Tiny3.Syntax where
 
 prog1 :: Stmt
 prog1 = SBlock [ 
+  SVar "x",
+  SVar "y",
   "x" := 1,
   SBlock [ SVar "x", "x" := 42 ], -- local variable
   "y" := 2,
