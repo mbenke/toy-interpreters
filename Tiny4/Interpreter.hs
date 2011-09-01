@@ -10,6 +10,7 @@ import Control.Monad.Trans
 import Control.Monad.Identity
 import Data.Maybe(catMaybes)
 
+
 data IntState = IntState { 
   store :: Store, 
   freeLocs :: [Loc], 
@@ -28,6 +29,15 @@ runProg p = do
   case res of
     Left e -> putStrLn e
     Right (a,state) -> print $ Map.toAscList (store state)
+
+-- * Values
+    
+data Val = VInt Integer | VStr String
+  deriving Show
+           
+getVInt :: Val -> IM Integer
+getVInt (VInt i) = return i
+getVInt v = throwError $ "Not an integer: "++show v
 
 -- * Store    
     
@@ -145,9 +155,12 @@ getVar v =  do
 
 -- | Evaluate expressions
 eval :: Exp -> IM Val
-eval (EInt i) = return i
+eval (EInt i) = return $ VInt i
 eval (EVar s) = getVar s
-eval (EAdd e1 e2) = liftM2 (+) (eval e1) (eval e2)
+eval (EAdd e1 e2) = do
+  i1 <- getVInt =<< eval e1 
+  i2 <- getVInt =<< eval e2
+  return $ VInt (i1+i2)                  
 
 -- | Execute statements
 exec :: Stmt -> IM ()

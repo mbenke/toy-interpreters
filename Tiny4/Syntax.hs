@@ -27,8 +27,6 @@ data Exp
     | EAdd Exp Exp
       deriving(Eq,Show)
 
-type Val = Integer
-
 instance Num Exp where
     fromInteger = EInt
     (+) = EAdd
