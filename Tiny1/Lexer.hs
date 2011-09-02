@@ -4,7 +4,7 @@ import qualified Data.Char(isSymbol)
 
 data Token = TInt Int | TId String | TOp String | TLet | TIn | TEOF
            | TLParen | TRParen
-  deriving Show
+  deriving (Eq,Show)
 
 elex1 :: String -> (Token,String)
 elex1 [] = (TEOF,[])

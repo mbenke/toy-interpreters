@@ -7,8 +7,7 @@ import qualified Tiny4.Interpreter as Tiny4
 
 main :: IO()
 main = do
-  Tiny1.testInterpreter
-  Tiny1.testLexer
+  Tiny1.test
   Tiny2.test
   Tiny3.test
   Tiny3b.test
