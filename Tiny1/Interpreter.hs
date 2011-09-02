@@ -39,5 +39,3 @@ exec (v := e) = do
   modify (Map.insert v x)
 exec (SExp e) = eval e >> return ()
 
-test :: IO()
-test = putStrLn $ runProg prog1
