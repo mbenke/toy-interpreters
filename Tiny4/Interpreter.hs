@@ -25,19 +25,38 @@ runIM m st = runErrorT (runStateT m st)
 
 runProg :: Stmt -> IO ()
 runProg p = do
-  res <- runIM (exec p) initState
+  res <- runIM (prepareRuntime >> exec p) initState
   case res of
     Left e -> putStrLn e
     Right (a,state) -> print $ Map.toAscList (store state)
 
+-- * Runtime
+prepareRuntime :: IM ()
+prepareRuntime = do
+  l1 <- new $ VStr "The base type"
+  loc <- new $ mkRec [("__doc__",l1)]
+  modifyEnv (updateEnv "object" loc)
+  modifyScopes (addLocal "object")
+  
 -- * Values
     
-data Val = VInt Integer | VStr String
-  deriving Show
-           
+data Val = VInt Integer | VStr String | VRec Record
+         deriving Show
+type Record = (Map.Map Name Loc)
+
+emptyRec::Val
+emptyRec = VRec Map.empty
+
+mkRec :: [(String,Loc)] -> Val
+mkRec dict = VRec $ Map.fromList dict
+
 getVInt :: Val -> IM Integer
 getVInt (VInt i) = return i
 getVInt v = throwError $ "Not an integer: "++show v
+
+getVRec :: Val -> IM Record
+getVRec (VRec r) = return r
+getVRec v = throwError $ "Not a record: "++show v
 
 -- * Store    
     
@@ -61,6 +80,12 @@ free l = do
 updateStore :: Loc -> Val -> IM ()
 updateStore v x = modify $ \state -> state { 
   store = Map.insert v x (store state)}
+
+new :: Val -> IM Loc
+new val = do -- alloc >>= \l -> updateStore l val >> return l
+  loc <- alloc
+  updateStore loc val
+  return loc
 
 getStore :: IM Store  
 getStore = gets store
@@ -149,9 +174,16 @@ getNameLoc n =  do
 getVar :: Name -> IM Val
 getVar v =  do
   loc <- getNameLoc v
+  readLoc loc
+  
+readLoc :: Loc -> IM Val
+readLoc loc = do
   store <- getStore 
   let res  = Map.lookup loc store
-  maybe (throwError $ "Unallocated var"++ v) return res
+  maybe (throwError $ "Unallocated loc"++ show loc) return res
+
+getFieldLoc :: Record -> Name -> (Maybe Loc)
+getFieldLoc r n =  (Map.lookup n r)
 
 -- | Evaluate expressions
 eval :: Exp -> IM Val
@@ -161,7 +193,12 @@ eval (EAdd e1 e2) = do
   i1 <- getVInt =<< eval e1 
   i2 <- getVInt =<< eval e2
   return $ VInt (i1+i2)                  
-
+eval (EDot e n) = do
+   v <- eval e
+   r <- getVRec v
+   maybe (throwError $ unwords [show v,"has no field",n]) 
+         readLoc
+         (getFieldLoc r n)
 -- | Execute statements
 exec :: Stmt -> IM ()
 exec (SVar n) = do
@@ -171,13 +208,28 @@ exec (SVar n) = do
   return ()
 exec (SBlock ss)= enterScope >> mapM_ exec ss >> leaveScope
 
-exec (v := e) = do
-  x <- eval e
-  loc <- getNameLoc v
-  updateStore loc x
+exec (lhs := e) = do
+  loc <- lhsLoc lhs
+  v <- eval e
+  updateStore loc v
+
 exec (SExp e) = eval e >>= liftIO . print 
 exec (SPrint e) = eval e >>= liftIO . print 
 -- exec x = error $ "exec unimplemented for " ++ show x
 
+lhsLoc :: Lhs -> IM Loc
+lhsLoc (LV v) = getNameLoc v
+lhsLoc (LhsDot lhs n) = do
+  rloc <- lhsLoc lhs
+  v <- readLoc rloc
+  r <- getVRec v
+  case getFieldLoc r n of
+    Just floc -> return floc
+    Nothing -> do -- create field if not exists
+      floc <- alloc
+      let r' = Map.insert n floc r
+      updateStore rloc (VRec r')
+      return floc
+  
 test :: IO()
 test = runProg prog1
