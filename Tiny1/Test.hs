@@ -15,7 +15,7 @@ prog1 = SBlock [
 -- undefined var
 bad1 = SExp $ EVar "x"
 
-text1 = "x=1y=2c=x+y"
+text1 = "x=1y=2 _=x+y"
 
 testInterpreter :: IO()
 testInterpreter = putStrLn $ runProg prog1

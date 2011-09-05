@@ -9,7 +9,7 @@ data Token = TInt Int | TId String | TOp String | TLet | TIn | TEOF
 elex1 :: String -> (Token,String)
 elex1 [] = (TEOF,[])
 elex1   (c:cs) | isSpace c = elex1 cs
-elex1   (c:cs) | isAlpha c = lexAlpha c cs
+elex1   (c:cs) | isIdent c = lexAlpha c cs
 elex1 s@(c:cs) | isDigit c = lexNum s
 elex1 s@(c:cs) | isSymbol c = lexOp s
 elxex1('(':cs) = (TLParen,cs)
