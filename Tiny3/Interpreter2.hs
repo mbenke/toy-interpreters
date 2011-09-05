@@ -167,6 +167,3 @@ exec (v := e) = do
 exec (SExp e) = eval e >>= liftIO . print 
 exec (SPrint e) = eval e >>= liftIO . print 
 -- exec x = error $ "exec unimplemented for " ++ show x
-
-test :: IO()
-test = runProg prog1

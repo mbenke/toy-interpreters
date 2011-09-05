@@ -1,18 +1,5 @@
 module Tiny3.Syntax where
 
-prog1 :: Stmt
-prog1 = SBlock [ 
-  SVar "x",
-  SVar "y",
-  "x" := 1,
-  SBlock [ SVar "x", "x" := 42 ], -- local variable
-  "y" := 2,
-  SPrint (EVar "x"+ EVar "y")
-  ]
-
--- undefined var
-bad1 = SExp $ EVar "x"
-
 data Stmt
   = SExp Exp
   | String := Exp
