@@ -5,8 +5,8 @@ buildTest:
 	ghc -o Test --make Test.hs
 
 clean:
-	-rm -f *.{hi,o}
+	-find . -name *.hi -o -name *.o -print | xargs rm -f
 	-rm -f Test
 
 distclean: clean
-	-rm -rf *~
+	-find . -name *~ -print | xargs rm -f
