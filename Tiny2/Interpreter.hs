@@ -42,6 +42,3 @@ exec (v := e) = do
   modify (Map.insert v x)
 exec (SExp e) = eval e >> return ()
 exec (SPrint e) = eval e >>= liftIO . print 
-
-test :: IO()
-test = runProg prog1
