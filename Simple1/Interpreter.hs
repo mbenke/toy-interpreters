@@ -183,12 +183,22 @@ eval (ELet n e1 e0) = do
      v0 <- eval e0
      leaveScope
      return v0
+eval (ELets ds e0) = do
+     enterScope
+     execDecls ds
+     v0 <- eval e0
+     leaveScope
+     return v0
      
 execDecl :: Name -> Exp -> IM ()
 execDecl n e = do
   v <- eval e
   l <- createVar n
   updateStore l v
+
+execDecls :: [(Name,Exp)] -> IM ()
+execDecls  [] = return ()
+execDecls ((n,e):ds) = execDecl n e >> execDecls ds
 
 -- | Execute statements
 exec :: Stmt -> IM ()

@@ -23,7 +23,7 @@ prog2 = SBlock [
   SVar "x",
   SVar "y",
   "x" := 1,
-  SExp$ ELet "x" 2 ( 
+  SExp$ ELets [("x", 2)] ( 
     EIf (EVar "x") (EVar "x") 42),
   "y" := 2,
   SExp (EVar "x"+ EVar "y")

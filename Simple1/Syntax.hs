@@ -13,6 +13,7 @@ data Exp
     | EVar String
     | EAdd Exp Exp
     | ELet String Exp Exp
+    | ELets [(String,Exp)] Exp
     | EIf Exp Exp Exp
       deriving(Eq,Show)
 
