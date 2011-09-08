@@ -2,12 +2,17 @@ module Simple2.Test where
 import Simple2.Syntax
 import Simple2.Interpreter
 
+derefVar :: Name -> Exp
+derefVar = EDeref . EVar
+
 test :: IO ()
 test = do
   putStrLn "Simple2/prog1"
   testInterpreter1
   putStrLn "  .../prog2"
   testInterpreter2
+  putStrLn "  .../prog3"
+  runProg prog3
 
 prog1 :: Stmt
 prog1 = SBlock [ 
@@ -28,7 +33,7 @@ prog2 = SExp $ ELets [
   ]
   (EVar "x"+ EVar "y")
 
-
+prog3 = SExp $ ELet "y" (ELet "x" (ENew 42) (EVar "x")) (derefVar "y")
 -- undefined var
 bad1 = SExp $ EVar "x"
 
