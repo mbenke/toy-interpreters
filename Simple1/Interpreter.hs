@@ -28,7 +28,14 @@ runProg p = do
   res <- runIM (exec p) initState
   case res of
     Left e -> putStrLn e
-    Right (a,state) -> print $ Map.toAscList (store state)
+    Right (a,state) -> printState state
+    
+printState :: IntState -> IO ()
+printState state = do
+  putStr "Env: "
+  printEnv (env state)
+  putStr "Store: "
+  print $ Map.toAscList (store state)
 
 -- * Values
 
@@ -78,6 +85,9 @@ type Name = String
 type Env = Map.Map Name [Loc]  -- a map name -> loc stack
 initEnv :: Env
 initEnv = Map.empty
+
+printEnv :: Env -> IO ()
+printEnv env = print $ Map.toAscList env
 
 type Scope = [Name]
 type Scopes = [Scope]

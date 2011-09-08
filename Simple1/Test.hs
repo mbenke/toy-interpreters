@@ -4,7 +4,9 @@ import Simple1.Interpreter
 
 test :: IO ()
 test = do
+  putStrLn "Simple1/prog1"
   testInterpreter1
+  putStrLn "  .../prog2"
   testInterpreter2
 
 prog1 :: Stmt
