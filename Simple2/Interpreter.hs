@@ -140,13 +140,12 @@ leaveScope :: IM ()
 leaveScope = do
   env <- getEnv
   scope <- popScope
-  -- TODO: free scope vars
   let scopeLocs = catMaybes $ map (flip lookupEnv env) scope
   mapM_ free scopeLocs
   let env' = foldr (\n e -> Map.update pop n e)env scope
   putEnv env' where
     pop :: [Loc] -> Maybe [Loc]
-    pop [] = Nothing
+    pop [x] = Nothing
     pop (x:xs) = Just xs
 
 createVar :: Name -> IM Loc
