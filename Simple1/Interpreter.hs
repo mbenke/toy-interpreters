@@ -178,14 +178,18 @@ eval (EIf e1 e2 e3) = do
      v1 <- eval e1
      if isTrueVal v1 then eval e2 else eval e3
 eval (ELet n e1 e0) = do
-     v1 <- eval e1
      enterScope
-     l <- createVar n
-     updateStore l v1
+     execDecl n e1
      v0 <- eval e0
      leaveScope
      return v0
      
+execDecl :: Name -> Exp -> IM ()
+execDecl n e = do
+  v <- eval e
+  l <- createVar n
+  updateStore l v
+
 -- | Execute statements
 exec :: Stmt -> IM ()
 exec (SVar n) = createVar n >> return ()
