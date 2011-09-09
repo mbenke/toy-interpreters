@@ -40,12 +40,12 @@ prog3 = [
 -- undefined var
 bad1 = [("_", EVar "x")]
 
-text2 = "l=new 1 x=*l \
-\ _ = let x = 2 in if x then x else 42\
+text2 = "l=new 1; x=*l \
+\ let x = 2 in if x then x else 42\
 \ y = 2\
-\ _ = x+y"
+\ x+y"
 
 text4 = "locals = new {}; \
-\ _=locals.y=1; \
-\ _ = if locals.y then locals.y = None else locals.y = 42;\ 
-\ _ = locals.y"
+\ locals.y=1; \
+\ if locals.y then locals.y = 42 else locals.y = None;\ 
+\ locals.y"

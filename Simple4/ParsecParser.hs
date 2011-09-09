@@ -33,7 +33,9 @@ pOptionalSemi :: Parser ()
 pOptionalSemi = optional $ symbol ";"
 
 pDef :: Parser Def
-pDef = do
+pDef = (try pFullDef) <|> ((\e -> ("_",e)) <$> pExp)
+
+pFullDef =do
   v <- identifier
   foo <- symbol "="
   e <- pExp
