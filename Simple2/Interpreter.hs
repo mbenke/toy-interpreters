@@ -39,8 +39,13 @@ printState state = do
 
 -- * Values
 
-data Val = VInt Integer | VLoc Loc | VNone deriving (Eq,Show)
+data Val = VInt Integer | VLoc Loc | VNone deriving (Eq)
 
+instance Show Val where
+  show (VInt n) = show n
+  show (VLoc l) = "loc:"++show l
+  show VNone = "None"
+  
 getVInt :: Val -> IM Integer
 getVInt (VInt i) = return i
 getVInt v = throwError $ "Not an integer: "++show v
@@ -53,6 +58,7 @@ isTrueVal :: Val -> Bool
 isTrueVal (VInt 0) = False
 isTrueVal (VInt _) = True
 isTrueVal (VLoc _) = True
+isTrueVal (VNone)  = False
 
 -- * Store    
     
