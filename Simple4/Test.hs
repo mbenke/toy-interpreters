@@ -45,6 +45,7 @@ text2 = "l=new 1 x=*l \
 \ y = 2\
 \ _ = x+y"
 
-text4 = "locals = new {} _=locals.y=1\
-\ _ = if locals.y then locals.y = None else locals.y = 42\ 
+text4 = "locals = new {}; \
+\ _=locals.y=1; \
+\ _ = if locals.y then locals.y = None else locals.y = 42;\ 
 \ _ = locals.y"

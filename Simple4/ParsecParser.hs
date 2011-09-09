@@ -27,7 +27,10 @@ pProg :: Parser Defs
 pProg = pDefs
 
 pDefs :: Parser Defs
-pDefs = many1 pDef
+pDefs = pDef `sepBy1` pOptionalSemi
+
+pOptionalSemi :: Parser ()
+pOptionalSemi = optional $ symbol ";"
 
 pDef :: Parser Def
 pDef = do
