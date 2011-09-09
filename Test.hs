@@ -6,6 +6,7 @@ import qualified Tiny4.Interpreter as Tiny4
 
 import qualified Simple1.Test as Simple1
 import qualified Simple2.Test as Simple2
+import qualified Simple3.Test as Simple3
 
 main :: IO()
 main = do
@@ -15,4 +16,4 @@ main = do
   Tiny4.test  
   Simple1.test
   Simple2.test
-
+  Simple3.test
