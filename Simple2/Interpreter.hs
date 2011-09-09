@@ -197,6 +197,7 @@ eval (EAdd e1 e2) = do -- liftM2 (+) (eval e1) (eval e2)
 eval (EIf e1 e2 e3) = do
      v1 <- eval e1
      if isTrueVal v1 then eval e2 else eval e3
+eval (ELet "_" e1 e0) = eval e1 >> eval e0
 eval (ELet n e1 e0) = do
      enterScope
      execDecl n e1
