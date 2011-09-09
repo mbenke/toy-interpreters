@@ -39,7 +39,7 @@ printState state = do
 
 -- * Values
 
-data Val = VInt Integer | VLoc Loc deriving (Eq,Show)
+data Val = VInt Integer | VLoc Loc | VNone deriving (Eq,Show)
 
 getVInt :: Val -> IM Integer
 getVInt (VInt i) = return i

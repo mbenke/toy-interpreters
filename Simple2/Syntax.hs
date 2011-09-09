@@ -18,6 +18,7 @@ data Exp
     | EIf Exp Exp Exp
     | ENew Exp
     | EDeref Exp 
+    | ENone
       deriving(Eq,Show)
 
 instance Num Exp where
