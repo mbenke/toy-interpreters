@@ -8,14 +8,16 @@ import qualified Simple1.Test as Simple1
 import qualified Simple2.Test as Simple2
 import qualified Simple3.Test as Simple3
 import qualified Simple4.Test as Simple4
+import qualified Simple5.Test as Simple5
 
 main :: IO()
-main = do
-  Tiny1.test
-  Tiny2.test
-  Tiny3.test
-  Tiny4.test  
-  Simple1.test
-  Simple2.test
-  Simple3.test
-  Simple4.test
+main = do  
+  -- Tiny1.test
+  -- Tiny2.test
+  -- Tiny3.test
+  -- Tiny4.test  
+  -- Simple1.test
+  -- Simple2.test
+  -- Simple3.test
+  -- Simple4.test
+  Simple5.test  
