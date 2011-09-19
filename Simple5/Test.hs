@@ -20,16 +20,24 @@ test = do
   putStrLn "  .../text4, expect None"
   testParser "text4" text4
   -}
+  putStrLn ".../prog5, expect 2"
+  runProg prog5
+
+  putStrLn ".../prog6, expect Break \"foo\""
+  runProg prog6 
+  putStrLn ".../prog7, expect 1"
+  runProg prog7 
+
 testIM :: IM () -> IO ()
 testIM m = do
   res <- runIM m initState
   case res of
     Left e -> putWordsLn ["Error:",e]
     Right (a,state) -> do
-      printState state      
       case a of
         Left exc -> putStrLn ("Exception: "++show exc)
         Right ok -> putStrLn ("OK: "++show ok)
+      printState state      
 
 putWordsLn :: [String] -> IO ()
 putWordsLn = putStrLn . unwords
@@ -75,3 +83,10 @@ text4 = "locals = new {}; \
 \ locals.y=1; \
 \ if locals.y then locals.y = 42 else locals.y = None;\ 
 \ locals.y"
+
+-- expect 2
+prog5 = [("_", ELabel "return" (ELet "x" ( 1) 2))]
+-- expect exception "foo"
+prog6 = [("_", ELabel "return" (ELet "x" (EBreak"foo" 1) 2))]
+-- expect 1
+prog7 = [("_", ELabel "return" (ELet "x" (EBreak"return" 1) 2))]

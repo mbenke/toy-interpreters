@@ -11,7 +11,17 @@ The exception monad transformer
 -}
 newtype ExceptionT e m a = ExceptionT { runExceptionT :: m (Either e a) }
 
+throwException :: (Monad m) => e -> ExceptionT e m a
+throwException = ExceptionT . return . Left
 
+catchException :: (Monad m) => ExceptionT e m a -> (e->ExceptionT e m a) -> ExceptionT e m a
+catchException etm h = ExceptionT $ do  
+  s <- runExceptionT etm
+  case s of
+    Left e -> runExceptionT (h e)
+    Right a -> (return (Right a))
+  -- either (runExceptionT . h) (return . Right) s
+  
 instance Monad m => Functor (ExceptionT e m) where
   fmap f m = ExceptionT $ do
     s <- runExceptionT m

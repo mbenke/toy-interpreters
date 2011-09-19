@@ -17,6 +17,8 @@ data Exp
     | ERecEmpty
     | EGet Name Name
     | ESet Name Name Exp
+    | ELabel Name Exp
+    | EBreak Name Exp
       deriving(Eq,Show)
 
 instance Num Exp where

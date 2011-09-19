@@ -20,8 +20,7 @@ data IntState = IntState {
 
 initState = IntState initStore initFreeLocs initEnv initScopes
 
-type Label = String
-data Exception = Break Label Val deriving Show
+data Exception = ExcBreak Name Val deriving Show
 
 type IM a = ExceptionT Exception (StateT IntState (ErrorT String IO)) a
 -- runIM :: IM a -> IntState -> IO (Either String (a,IntState))
@@ -33,10 +32,10 @@ runProg p = do
   case res of
     Left e -> putStrLn ("Error:"++e)
     Right (a,state) -> do
-      printState state      
       case a of
         Left exc -> putStrLn ("Exception: "++show exc)
         Right ok -> putStrLn ("OK: "++show ok)
+      printState state      
 
     
 printState :: IntState -> IO ()
@@ -253,6 +252,12 @@ eval (ESet n1 n2 e) = do
   updateStore l (VRec (Map.insert n2 v r))
   return v
 eval ENone = return VNone
+eval (ELabel n e) = eval e `catchException` handleBreak n where
+  handleBreak n (ExcBreak l v) | l == n = return v
+  handleBreak n e = throwException e
+eval (EBreak l e) = do
+  v <- eval e
+  throwException (ExcBreak l v)
 
 getFieldVal :: Name -> Record -> Maybe Val
 getFieldVal n r= Map.lookup n r
