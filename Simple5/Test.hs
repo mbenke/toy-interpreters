@@ -26,8 +26,9 @@ test = do
   putStrLn ".../prog6, expect Break \"foo\""
   runProg prog6 
   putStrLn ".../prog7, expect 1"
-  runProg prog7 
-
+  -- runProg prog7 
+  testParser "text7" text7
+  
 testIM :: IM () -> IO ()
 testIM m = do
   res <- runIM m initState
@@ -90,3 +91,4 @@ prog5 = [("_", ELabel "return" (ELet "x" ( 1) 2))]
 prog6 = [("_", ELabel "return" (ELet "x" (EBreak"foo" 1) 2))]
 -- expect 1
 prog7 = [("_", ELabel "return" (ELet "x" (EBreak"return" 1) 2))]
+text7 = "return: let x=break return 1 in 2"
