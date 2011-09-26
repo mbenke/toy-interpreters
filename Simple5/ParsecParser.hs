@@ -24,10 +24,13 @@ runParser :: String -> String -> Either ParseError Defs
 runParser info input = parse pProg info input
 
 pProg :: Parser Defs
-pProg = pDefs
+pProg = do 
+  defs <- pDefs
+  eof
+  return defs
 
 pDefs :: Parser Defs
-pDefs = pDef `sepBy1` pOptionalSemi
+pDefs = pDef `sepBy1` (symbol ";") --pOptionalSemi
 
 pOptionalSemi :: Parser ()
 pOptionalSemi = optional $ symbol ";"
@@ -42,7 +45,28 @@ pFullDef =do
   return $ (v, e)
   
 pExp, pTerm, pF :: Parser Exp
-pExp = pIf <|> pNew <|> pLet <|> pArith <|> pBreak
+pExp = pFunc <|> pIf <|> pNew <|> pLet <|> pArith <|> pBreak
+
+pFunc = do
+  kw "func"
+  symbol "("
+  params <- pParams
+  symbol ")"
+  body <- pExp
+  pMaybeCall (EFunc(Func params body))
+
+pParams = pParam `sepBy` (symbol ",")
+pParam = identifier
+
+pMaybeCall f = do
+  pCall f <|> return f
+
+pCall f = do
+  symbol "("
+  es <- pActParams 
+  symbol ")"
+  return $ ECall f es
+pActParams = pExp `sepBy` (symbol ",")
 
 pIf = do
   kw "if"
@@ -84,8 +108,8 @@ pIdExp = identifier >>= pIdExp'
 pIdExp' :: Name -> Parser Exp
 pIdExp' n = (symbol "." >> identifier >>= pIdExp'' n )
           <|> (symbol ":" >> pLabel n)
-          <|> (return $ EVar n)
-          
+          -- <|> (return $ EVar n)
+          <|> pMaybeCall (EVar n)
 pIdExp'' n n2 = (symbol "=" >> (ESet n n2 <$> pExp))
                 <|> (return $ EGet n n2)
                 

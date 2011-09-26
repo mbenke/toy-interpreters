@@ -29,13 +29,18 @@ test = do
   -- runProg prog7 
   testParser "text7" text7
   putStrLn "\n.../prog8, expect identity fun"
-  runProg prog8
+  -- runProg prog8
+  testParser "text8" text8
   putStrLn "\n.../prog9, expect 42"  
-  runProg prog9
-  putStrLn "\n.../prog10, expect error"
-  runProg prog10
-  putStrLn "\n.../prog11, expect error"
-  runProg prog11  
+  -- runProg prog9
+  testParser "text9" text9
+  putStrLn "\n.../prog10, expect error: too many args"
+  -- runProg prog10
+  testParser "text10" text10
+  putStrLn "\n.../prog11, expect error: not enough args"
+  -- runProg prog11  
+  testParser "text11" text11
+
 
 testIM :: IM () -> IO ()
 testIM m = do
@@ -107,9 +112,17 @@ text7 = "return: let x=break return 1 in 2"
 func1 = EFunc (Func ["x"] (EVar "x"))
 -- expect id
 prog8 = expr func1
+text8 = "func(x) x"
 -- expect 42
 prog9 = expr $ ECall func1 [EInt 42]
+text9 = "i=func(x)x;i(42)"
+
+-- this fails parse - FIXME
+--text9 = "(func(x)x)(42)"
+
 -- expect error
 prog10 = expr $ ECall func1 [EInt 42,EInt 1]
+text10 = "i=func(x)x;i(42,1)"
 -- expect error
 prog11 = expr $ ECall func1 []
+text11 = "i=func(x)x;i()"
