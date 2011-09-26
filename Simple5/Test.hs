@@ -1,4 +1,4 @@
-module Simple5.Test where
+module Simple5.Test(test) where
 import Simple5.Syntax
 import Simple5.Interpreter
 import qualified Simple5.ParsecParser as Parser
@@ -28,7 +28,15 @@ test = do
   putStrLn ".../prog7, expect 1"
   -- runProg prog7 
   testParser "text7" text7
-  
+  putStrLn "\n.../prog8, expect identity fun"
+  runProg prog8
+  putStrLn "\n.../prog9, expect 42"  
+  runProg prog9
+  putStrLn "\n.../prog10, expect error"
+  runProg prog10
+  putStrLn "\n.../prog11, expect error"
+  runProg prog11  
+
 testIM :: IM () -> IO ()
 testIM m = do
   res <- runIM m initState
@@ -85,10 +93,23 @@ text4 = "locals = new {}; \
 \ if locals.y then locals.y = 42 else locals.y = None;\ 
 \ locals.y"
 
+expr :: Exp -> Defs
+expr e = [("_",e)]
+
 -- expect 2
-prog5 = [("_", ELabel "return" (ELet "x" ( 1) 2))]
+prog5 = expr $ ELabel "return" (ELet "x" ( 1) 2)
 -- expect exception "foo"
-prog6 = [("_", ELabel "return" (ELet "x" (EBreak"foo" 1) 2))]
+prog6 = expr $ ELabel "return" (ELet "x" (EBreak"foo" 1) 2)
 -- expect 1
-prog7 = [("_", ELabel "return" (ELet "x" (EBreak"return" 1) 2))]
+prog7 = expr $ ELabel "return" (ELet "x" (EBreak"return" 1) 2)
 text7 = "return: let x=break return 1 in 2"
+
+func1 = EFunc (Func ["x"] (EVar "x"))
+-- expect id
+prog8 = expr func1
+-- expect 42
+prog9 = expr $ ECall func1 [EInt 42]
+-- expect error
+prog10 = expr $ ECall func1 [EInt 42,EInt 1]
+-- expect error
+prog11 = expr $ ECall func1 []

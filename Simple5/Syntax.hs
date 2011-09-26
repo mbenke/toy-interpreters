@@ -3,6 +3,7 @@ module Simple5.Syntax where
 type Name = String
 type Defs = [Def]
 type Def = (Name,Exp)
+type Param = Name
 
 data Exp
     = EInt Integer
@@ -19,7 +20,11 @@ data Exp
     | ESet Name Name Exp
     | ELabel Name Exp
     | EBreak Name Exp
-      deriving(Eq,Show)
+    | EFunc Func
+    | ECall Exp [Exp]
+      deriving (Eq,Show)
+
+data Func = Func [Param] Exp deriving (Eq,Show)
 
 instance Num Exp where
     fromInteger = EInt

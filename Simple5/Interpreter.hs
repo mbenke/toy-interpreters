@@ -30,7 +30,7 @@ runProg :: Defs -> IO ()
 runProg p = do
   res <- runIM (evalDefs p) initState
   case res of
-    Left e -> putStrLn ("Error:"++e)
+    Left e -> putStrLn ("Error: "++e)
     Right (a,state) -> do
       case a of
         Left exc -> putStrLn ("Exception: "++show exc)
@@ -48,6 +48,7 @@ printState state = do
 -- * Values
 
 data Val = VInt Integer | VLoc Loc | VNone | VRec Record
+         | VFun Func
          deriving (Eq) 
 type Record = (Map.Map Name Val)
 
@@ -56,7 +57,8 @@ instance Show Val where
   show (VLoc l) = "loc:"++show l
   show VNone = "None"
   show (VRec map) =  show $ Map.toAscList map
-
+  show (VFun f) = show f
+  
 getVInt :: Val -> IM Integer
 getVInt (VInt i) = return i
 getVInt v = throwError $ "Not an integer: "++show v
@@ -68,6 +70,10 @@ getVLoc v = throwError $ "Not a loc: "++show v
 getVRec :: Val -> IM Record
 getVRec (VRec r) = return r
 getVRec v = throwError $ "Not a record: "++show v
+
+getVFun :: Val -> IM Func
+getVFun (VFun f) = return f
+getVFun v = throwError $ "Not a function: "++show v
 
 isTrueVal :: Val -> Bool
 isTrueVal (VInt 0) = False
@@ -258,7 +264,24 @@ eval (ELabel n e) = eval e `catchException` handleBreak n where
 eval (EBreak l e) = do
   v <- eval e
   throwException (ExcBreak l v)
-
+eval (EFunc f) = return (VFun f)
+eval call@(ECall e es) = do
+  v <- eval e
+  f@(Func as body) <- getVFun v
+  vs <- mapM eval es
+  enterScope
+  passParams as vs
+  r <- eval body
+  leaveScope
+  return r where
+    passParams [] [] = return ()
+    passParams as [] = throwError $ "Not enough args in call: "++show call
+    passParams [] vs = throwError $ "Too many args in call: "++show call
+    passParams (a:as) (v:vs) = do
+      l <- createVar a
+      updateStore l v
+      passParams as vs
+      
 getFieldVal :: Name -> Record -> Maybe Val
 getFieldVal n r= Map.lookup n r
 
