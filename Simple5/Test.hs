@@ -1,7 +1,8 @@
 module Simple5.Test(test) where
 import Simple5.Syntax
 import Simple5.Interpreter
-import qualified Simple5.ParsecParser as Parser
+-- import qualified Simple5.ParsecParser as Parser
+import qualified Simple5.ApplicativeParser as Parser
 
 import Control.Monad.Error
 
