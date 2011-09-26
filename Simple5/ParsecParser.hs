@@ -53,7 +53,7 @@ pFunc = do
   params <- pParams
   symbol ")"
   body <- pExp
-  pMaybeCall (EFunc(Func params body))
+  return (EFunc(Func params body))
 
 pParams = pParam `sepBy` (symbol ",")
 pParam = identifier
@@ -93,7 +93,7 @@ pArith = pTerm `chainl1` pAdd
 pAdd = symbol "+" >> return EAdd
 
 pTerm = pF
-pF = EInt <$> integer <|> pIdExp <|> parens pExp 
+pF = EInt <$> integer <|> pIdExp <|> (parens pExp >>= pMaybeCall) 
           <|> EDeref <$> (EVar <$> (symbol "*" >> identifier))
           <|> pRec 
           <|> (kw "None" >> return ENone)
