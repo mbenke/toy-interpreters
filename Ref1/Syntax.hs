@@ -1,4 +1,4 @@
-module Syntax where
+module Ref1.Syntax where
 import Data.Map(Map)
 import qualified Data.Map as Map
 
@@ -18,6 +18,7 @@ data Exp
   | EIf Exp Exp Exp
   | EGet Name Name
   | ESet Name Name Exp
+  | EInt Integer
   deriving Show  
            
 data Type = TInt | TVar Name | TRec RecType 
