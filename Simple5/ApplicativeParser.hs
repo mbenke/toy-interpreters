@@ -10,11 +10,11 @@ import qualified Text.ParserCombinators.Parsec.Token as PT
 import Text.ParserCombinators.Parsec.Language(emptyDef)
 
 -- Caution, Applicative.(<|>) conflicts with Parsec
-import Control.Applicative(Applicative,pure,(<*>),(<*),(*>),liftA2) 
+import Control.Applicative(pure,(<*>),(<*),(*>),liftA2) 
 
-instance Applicative (GenParser s a) where
-  pure = return
-  (<*>) = ap
+-- instance Applicative (GenParser s a) where
+--   pure = return
+--   (<*>) = ap
 
 
 langDef = emptyDef { 
