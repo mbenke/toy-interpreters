@@ -24,3 +24,17 @@ newtype Constraint = Constraint (Name, Type)
   
 oneFieldRec :: Name -> Type -> Type
 oneFieldRec a t = TRec $ Map.fromList [(a,t)]
+
+instance Show Constraint where
+  show (Constraint  (x,t)) = concat [x,"<",show t]
+  
+showRec :: RecType -> String 
+showRec r = concat ["{",showFields fields,"}"] where
+  fields = Map.toList r 
+  showFields  = concatMap showField
+  showField (l,t) = concat [l,":",show t]
+  
+instance Show Type where
+  show TInt = "int"
+  show (TRec r) = showRec r
+  show (TVar v) = v

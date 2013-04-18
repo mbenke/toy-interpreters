@@ -22,21 +22,7 @@ data CheckState = CheckState {
 
 instance Show CheckState where
   show cst = show $ cstCons cst
-  
-instance Show Constraint where
-  show (Constraint  (x,t)) = concat [x,"<",show t]
-  
-showRec :: RecType -> String 
-showRec r = concat ["{",showFields fields,"}"] where
-  fields = Map.toList r 
-  showFields  = concatMap showField
-  showField (l,t) = concat [l,":",show t]
-  
-instance Show Type where
-  show TInt = "int"
-  show (TRec r) = showRec r
-  show (TVar v) = v
-  
+    
 initState :: CheckState
 initState = CheckState [] [1..]
   
