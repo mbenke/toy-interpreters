@@ -1,4 +1,4 @@
-module Ref1.Syntax where
+module Rec1.Syntax where
 import Data.Map(Map)
 import qualified Data.Map as Map
 

@@ -1,5 +1,5 @@
-module Ref1.Parser where
-import Ref1.Syntax
+module Rec1.Parser where
+import Rec1.Syntax
 
 import Text.ParserCombinators.Parsec hiding(runParser)
 import qualified Text.ParserCombinators.Parsec.Token as PT
