@@ -1,6 +1,7 @@
 module Rec1.Syntax where
 import Data.Map(Map)
 import qualified Data.Map as Map
+import Data.List(intersperse)
 
 type Name = String
 type Defs = [Def]
@@ -33,7 +34,7 @@ instance Show Constraint where
 showRec :: RecType -> String 
 showRec r = concat ["{",showFields fields,"}"] where
   fields = Map.toList r 
-  showFields  = concatMap showField
+  showFields  = concat . intersperse ","  . map showField
   showField (l,t) = concat [l,":",show t]
   
 instance Show Type where
