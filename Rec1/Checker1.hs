@@ -20,6 +20,27 @@ noConstraints = Map.empty
 oneConstraint :: Name -> Type -> Constraints
 oneConstraint n t = Map.fromList [(n,t)]
 
+updateConstraints :: Constraints -> Constraints -> Constraints
+updateConstraints psi1 psi2 = Map.foldrWithKey updateStep psi1 psi2 where
+  updateStep :: Name -> Type -> Constraints -> Constraints
+  updateStep n t psi = Map.insertWith updateRecs n t psi
+  -- t1 \updconstr t2
+  updateRecs :: Type -> Type -> Type
+  updateRecs (TRec r1) (TRec r2) = TRec $ updateRecMaps r1 r2
+  updateRecs t1       t2 = t2
+  -- tr1 \updconstr tr2
+
+updateRecMaps :: RecType -> RecType -> RecType
+updateRecMaps m1 m2 = foldrRec rtUpdateField m1 m2
+
+-- | rtUpdateField n t r = r \updconstr \{ n : t \}
+rtUpdateField :: Name -> Type -> RecType -> RecType
+rtUpdateField = Map.insert 
+
+-- foldrWithKey :: (k -> a -> b -> b) -> b -> Map k a -> b
+foldrRec :: (Name -> Type -> RecType -> RecType) -> RecType -> RecType -> RecType
+foldrRec = Map.foldrWithKey
+
 -- * Typing
 
 data Typing  = Typing {tyPre :: Constraints,tyTy :: Type, tyPost :: Constraints}
@@ -77,3 +98,16 @@ findType (ENew)   env = typ <$> freshName "X" where
 -- * Tests and examples
 test1 =  evalCM (findType (EInt 1) emptyEnv) initState 
 test2 =  evalCM (findType (ENew) emptyEnv) initState 
+
+recT1, recT2 :: RecType
+recT1 = Map.fromList [("a",TVar "Xa"),("b", TVar "Xb")]
+recT2 = Map.fromList [("c",TVar "Yc"),("b", TVar "Yb")]
+{-
+*Rec1.Checker1> updateRecMaps recT1 recT2
+fromList [("a",Xa),("b",Yb),("c",Yc)]
+*Rec1.Checker1> updateRecMaps recT2 recT1
+fromList [("a",Xa),("b",Xb),("c",Yc)]
+-}
+psi1 = Map.fromList [("Z1",TRec recT1),("Z2",emptyRec)]
+psi2 = Map.fromList [("Z1",TRec recT2)]
+psi3 = Map.fromList [("Z2",TRec recT2)]
