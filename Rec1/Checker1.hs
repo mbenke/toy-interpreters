@@ -10,13 +10,7 @@ import Control.Monad.Identity
 
 import Control.Applicative
 
-type Env = Map Name Type
-
-emptyEnv :: Env
-emptyEnv = Map.empty
-
-extendEnv :: Name -> Type -> Env -> Env
-extendEnv x t env = Map.insert x t env
+-- * Constraints
 
 -- newtype Constraint = Constraint (Name, Type)
 type Constraints = Map Name Type
@@ -26,11 +20,23 @@ noConstraints = Map.empty
 oneConstraint :: Name -> Type -> Constraints
 oneConstraint n t = Map.fromList [(n,t)]
 
+-- * Typing
+
 data Typing  = Typing {tyPre :: Constraints,tyTy :: Type, tyPost :: Constraints}
   deriving Show
 
 pureType :: Type -> Typing
 pureType t = Typing noConstraints t noConstraints
+
+-- * Checker Monad
+
+type Env = Map Name Type
+
+emptyEnv :: Env
+emptyEnv = Map.empty
+
+extendEnv :: Name -> Type -> Env -> Env
+extendEnv x t env = Map.insert x t env
 
 data CheckState = CheckState { 
   cstFresh :: Int
@@ -68,5 +74,6 @@ findType (EInt _) env = return $ pureType TInt
 findType (ENew)   env = typ <$> freshName "X" where
          typ x = Typing noConstraints (TVar x) (oneConstraint x emptyRec)
 
+-- * Tests and examples
 test1 =  evalCM (findType (EInt 1) emptyEnv) initState 
 test2 =  evalCM (findType (ENew) emptyEnv) initState 
