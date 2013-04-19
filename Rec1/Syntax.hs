@@ -21,7 +21,9 @@ data Exp
 data Type = TInt | TVar Name | TRec RecType 
 type RecType = (Map Name Type)
 newtype Constraint = Constraint (Name, Type)
-  
+
+emptyRec :: Type
+emptyRec = TRec Map.empty  
 oneFieldRec :: Name -> Type -> Type
 oneFieldRec a t = TRec $ Map.fromList [(a,t)]
 
