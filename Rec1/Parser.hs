@@ -1,4 +1,4 @@
-module Rec1.Parser where
+module Rec1.Parser(Parser,parse, runParser,parseExp,pProg,pExp) where
 import Rec1.Syntax
 
 import Text.ParserCombinators.Parsec hiding(runParser)
@@ -12,6 +12,7 @@ import Data.Functor
 langDef = emptyDef { 
   PT.reservedNames = ["let", "in", "new", "do"
                       ,"if","then","else", "label"
+                      ,"bot"
                      ]}
 
 lexer = PT.makeTokenParser langDef
@@ -25,6 +26,13 @@ kw = reserved
 
 runParser :: String -> String -> Either ParseError Defs
 runParser info input = parse pProg info input
+
+forceParse :: Parser a -> SourceName -> String -> a
+forceParse p sn inp = case parse p sn inp of
+           Left  e -> error $ show  e
+           Right r -> r
+
+parseExp = forceParse pExp 
 
 pProg :: Parser Defs
 pProg = pDefs <* eof
@@ -68,10 +76,3 @@ pDotted = (flip ($)) <$> (symbol "." *> identifier ) <*> pIdExp''
 pIdExp'' :: Parser (Name -> Name -> Exp)
 pIdExp'' = (\e x1 x2 -> ESet x1 x2 e) <$>(symbol "=" *>  pExp)
                 <|> pure EGet 
-
-test1 = parse pExp "t1" "x"
-test2 =  runParser "text2" text2
-text2 = "l=new; l.x = 1 ;\
-\ let x = l.x in if x then x else 42;\
-\ y = 2;\
-\ l.x"

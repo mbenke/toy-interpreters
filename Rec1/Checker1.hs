@@ -95,19 +95,3 @@ findType (EInt _) env = return $ pureType TInt
 findType (ENew)   env = typ <$> freshName "X" where
          typ x = Typing noConstraints (TVar x) (oneConstraint x emptyRec)
 
--- * Tests and examples
-test1 =  evalCM (findType (EInt 1) emptyEnv) initState 
-test2 =  evalCM (findType (ENew) emptyEnv) initState 
-
-recT1, recT2 :: RecType
-recT1 = Map.fromList [("a",TVar "Xa"),("b", TVar "Xb")]
-recT2 = Map.fromList [("c",TVar "Yc"),("b", TVar "Yb")]
-{-
-*Rec1.Checker1> updateRecMaps recT1 recT2
-fromList [("a",Xa),("b",Yb),("c",Yc)]
-*Rec1.Checker1> updateRecMaps recT2 recT1
-fromList [("a",Xa),("b",Xb),("c",Yc)]
--}
-psi1 = Map.fromList [("Z1",TRec recT1),("Z2",emptyRec)]
-psi2 = Map.fromList [("Z1",TRec recT2)]
-psi3 = Map.fromList [("Z2",TRec recT2)]
