@@ -23,6 +23,8 @@ showsAtom = showString
 
 data Term = Var Id
           | Struct Atom [Term]
+          deriving Eq
+
 term0 :: Atom -> Term
 term0 a = Struct a []
 
@@ -36,10 +38,21 @@ instance Show Term where
   showList [] = id
   showList ts = foldr1 (\s r -> s . showChar ',' . r) $ map shows ts
 
+renameVars :: Int -> Term -> Term
+renameVars lev (Var (Id s n)) = Var (Id s lev)
+renameVars lev (Struct s ts) = Struct s (map (renameVars lev) ts)
+
 data Clause = Term :- [Term]
               deriving Show
                        
 data Database = Db [(Atom,[Clause])]
+
+clausesFor :: Atom -> Database  -> [Clause]
+clausesFor a (Db rss) = concat [ cs | (a1,cs) <- rss, a == a1]
+
+renClauses :: Database -> Int -> Term -> [Clause]
+renClauses db n (Struct a _) = [ r tm :- map r tp | (tm :- tp) <- clausesFor a db ]
+           where r = renameVars n
 
 -- # Substitutions 
 
@@ -62,6 +75,8 @@ nullSubst i = Var i
 (@@) :: Subst -> Subst -> Subst
 s1 @@ s2 = apply s1 . s2
 
+solution :: [Id] -> Subst -> [String]
+solution ids s = [unwords[show id,"=",show t] | (id,t) <- [(i,s i) | i <- ids], t /=Var id] 
 unify :: Term -> Term -> [Subst]
 unify (Var x) (Var y) = if x == y then [nullSubst] else [x->>Var y]
 unify (Var x) t = [x ->> t] -- OBS no occur check
@@ -76,3 +91,29 @@ listUnify (t:ts) (r:rs) = [u2 @@ u1
                                             (mapApply u1 rs)
                           ]                                                            
 listUnify _  _ = []
+
+-- # Proof Tree
+
+data Prooftree = Done Subst | Choice [Prooftree]
+
+prooftree :: Database -> Int -> Subst -> [Term] -> Prooftree
+-- for each clause with head unifiable against first goal,
+-- get new goal list: add clause body at FRONT of goals
+-- (to get depth first), and apply unifier; also
+-- update accumulated substitution
+prooftree db = pt where
+      -- Depth, part res, goals
+   pt :: Int -> Subst -> [Term] -> Prooftree
+   pt n s [] = Done s
+   pt n s (g:gs) = Choice [ pt (n+1) (u@@s) (mapApply u (tp++gs) )
+                          | tm :- tp <- renClauses db n g
+                          , u <- unify g tm
+                          ]
+
+
+search :: Prooftree -> [Subst]
+search (Done s) = [s]
+search (Choice pts) = [s | pt <- pts, s <- search pt]
+
+prove :: Database -> [Term] -> [Subst]
+prove db = search . prooftree db 1 nullSubst
