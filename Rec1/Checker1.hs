@@ -44,7 +44,9 @@ foldrRec = Map.foldrWithKey
 -- * Typing
 
 data Typing  = Typing {tyPre :: Constraints,tyTy :: Type, tyPost :: Constraints}
-  deriving Show
+--  deriving Show
+instance Show Typing where
+    show (Typing pre typ post) = unwords [show pre, "=>", show typ, ";", show post]
 
 pureType :: Type -> Typing
 pureType t = Typing noConstraints t noConstraints
