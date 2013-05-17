@@ -9,38 +9,7 @@ import Control.Monad.State
 import Control.Monad.Identity
 
 import Control.Applicative
-import Data.List(intercalate)
 
--- * Constraints
-
--- newtype Constraint = Constraint (Name, Type)
-type Constraints = Map Name Type
-noConstraints :: Constraints
-noConstraints = Map.empty
-
-oneConstraint :: Name -> Type -> Constraints
-oneConstraint n t = Map.fromList [(n,t)]
-
-updateConstraints :: Constraints -> Constraints -> Constraints
-updateConstraints psi1 psi2 = Map.foldrWithKey updateStep psi1 psi2 where
-  updateStep :: Name -> Type -> Constraints -> Constraints
-  updateStep n t psi = Map.insertWith updateRecs n t psi
-  -- t1 \updconstr t2
-  updateRecs :: Type -> Type -> Type
-  updateRecs (TRec r1) (TRec r2) = TRec $ updateRecMaps r1 r2
-  updateRecs t1       t2 = t2
-  -- tr1 \updconstr tr2
-
-updateRecMaps :: RecType -> RecType -> RecType
-updateRecMaps m1 m2 = foldrRec rtUpdateField m1 m2
-
--- | rtUpdateField n t r = r \updconstr \{ n : t \}
-rtUpdateField :: Name -> Type -> RecType -> RecType
-rtUpdateField = Map.insert 
-
--- foldrWithKey :: (k -> a -> b -> b) -> b -> Map k a -> b
-foldrRec :: (Name -> Type -> RecType -> RecType) -> RecType -> RecType -> RecType
-foldrRec = Map.foldrWithKey
 
 -- * Typing
 
@@ -49,14 +18,6 @@ data Typing  = Typing {tyPre :: Constraints,tyTy :: Type, tyPost :: Constraints}
 instance Show Typing where
     show (Typing pre typ post) = unwords [showConstraints pre, "=>", show typ, ";", 
                                           showConstraints post]
-showConstraints ::  Constraints  -> String
-showConstraints = showConList . Map.toList
-
-showConList :: [(Name,Type)] -> String
-showConList = intercalate "," . map showCon
-
-showCon :: (Name,Type) -> String
-showCon (x,t) = concat [x,"<",show t] 
 
 pureType :: Type -> Typing
 pureType t = Typing noConstraints t noConstraints
