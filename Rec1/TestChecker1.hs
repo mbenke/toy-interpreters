@@ -9,9 +9,9 @@ import qualified Data.Map as Map
 -- * Tests and examples
 testExp1 :: Exp
 testExp1 = parseExp "testExp1" "1"
-testExp3 = parseExp "testExp3" "let x = new in x.a = 1"
+testExp3 = parseExp "testExp3" "let x = new in x" -- x.a = 1"
 
-allTests = [test1, test2]
+allTests = [test1, test2, test3]
 test1 = testFT (EInt 1) 
 test2 = testFT ENew
 test3 = testFT testExp3

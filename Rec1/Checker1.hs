@@ -68,3 +68,23 @@ findType (EInt _) env = return $ pureType TInt
 findType (ENew)   env = typ <$> freshName "X" where
          typ x = Typing noConstraints (TVar x) (oneConstraint x emptyRec)
 
+findType (ELets [] e) env = findType e env
+findType (ELets ((x,e1):ds) e0) env = findType (ELet x e1 (ELets ds e0)) env
+
+findType (ELet x e1 e0) env = do
+         ting1@(Typing psi11 t1 psi12) <- findType e1 env
+         let env' = extendEnv x t1 env
+         ting0 <- findType e0 env'
+         return $ seqTypings ting1 ting0
+
+findType e env = error $ "FindType unimplemented for " ++ show e
+
+backPatchCons :: Constraints -> Constraints -> Constraints -> Constraints
+backPatchCons psi01 psi11 psi12 = psi01 -- FIXME 
+
+seqTypings :: Typing -> Typing -> Typing
+seqTypings (Typing pre1 t1 post1) (Typing pre0 t0 post0) = 
+   Typing pre2 t0 post2 where
+           pre2 = pre0
+           post2 = post1 `updateConstraints` post0
+           
