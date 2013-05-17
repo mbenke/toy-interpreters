@@ -9,6 +9,7 @@ import Control.Monad.State
 import Control.Monad.Identity
 
 import Control.Applicative
+import Data.List(intercalate)
 
 -- * Constraints
 
@@ -46,7 +47,16 @@ foldrRec = Map.foldrWithKey
 data Typing  = Typing {tyPre :: Constraints,tyTy :: Type, tyPost :: Constraints}
 --  deriving Show
 instance Show Typing where
-    show (Typing pre typ post) = unwords [show pre, "=>", show typ, ";", show post]
+    show (Typing pre typ post) = unwords [showConstraints pre, "=>", show typ, ";", 
+                                          showConstraints post]
+showConstraints ::  Constraints  -> String
+showConstraints = showConList . Map.toList
+
+showConList :: [(Name,Type)] -> String
+showConList = intercalate "," . map showCon
+
+showCon :: (Name,Type) -> String
+showCon (x,t) = concat [x,"<",show t] 
 
 pureType :: Type -> Typing
 pureType t = Typing noConstraints t noConstraints
