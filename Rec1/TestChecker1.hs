@@ -33,3 +33,5 @@ psi3 = Map.fromList [("Z2",TRec recT2)]
 runAllTests = runTests allTests
 
 runTests = mapM_ print
+
+main = runAllTests
