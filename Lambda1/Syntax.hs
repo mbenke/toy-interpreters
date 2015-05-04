@@ -29,7 +29,7 @@ skk42 = mkS $$ mkK $$ mkK $$ EInt 42
 mkOmega :: Exp
 mkOmega = ELam "x" $ EApp (EVar "x") (EVar "x")
 
-kio = mkK $$ mkI $$ mkOmega
+kio = mkK $$ mkI $$ (mkOmega $$ mkOmega)
 
 -- Show
 showName :: Name -> ShowS
