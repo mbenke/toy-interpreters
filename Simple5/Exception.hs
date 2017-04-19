@@ -2,9 +2,10 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Simple5.Exception where
 import Control.Monad.Trans
-import Control.Monad.Error
+import Control.Monad.Except
 import Control.Monad.Reader
 import Control.Monad.State
+import Control.Monad.Error(ap)
 
 {- |
 The exception monad transformer
@@ -26,7 +27,11 @@ instance Monad m => Functor (ExceptionT e m) where
   fmap f m = ExceptionT $ do
     s <- runExceptionT m
     either (return.Left) (return.Right . f) s
-      
+
+instance Monad m => Applicative (ExceptionT e m) where
+  pure = return
+  (<*>) = ap
+
 instance Monad m => Monad (ExceptionT e m) where
   return = ExceptionT . return . Right
   m >>= k = ExceptionT $ do
