@@ -1,4 +1,5 @@
 GHC=stack ghc --
+EXECUTABLES=Test TestTiny1 TestTiny2
 
 all: buildTest
 	./Test
@@ -17,7 +18,7 @@ tiny2-test:
 clean:
 	-find . -name \*.hi -delete
 	-find . -name \*.o -delete
-	-rm -f Test
+	-rm -f $(EXECUTABLES)
 
 distclean: clean
 	-find . -name \*~ -delete
