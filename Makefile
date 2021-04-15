@@ -1,8 +1,14 @@
+GHC=stack ghc --
+
 all: buildTest
 	./Test
 
 buildTest: 
-	ghc -o Test --make Test.hs
+	$(GHC) -o Test --make Test.hs
+
+tiny1-test:
+	$(GHC) TestTiny1
+	./TestTiny1
 
 clean:
 	-find . -name \*.hi -delete
