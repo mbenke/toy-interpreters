@@ -3,7 +3,7 @@ module Tiny2.Interpreter where
 import Tiny2.Syntax
 
 import qualified Data.Map as Map
-import Control.Monad.Error
+import Control.Monad.Except
 import Control.Monad.State
 import Control.Monad.Trans
 import Control.Monad.Identity
@@ -14,9 +14,9 @@ initStore = Map.empty
 
 type IntState = Store
 
-type IM a = StateT IntState (ErrorT String IO) a
+type IM a = StateT IntState (ExceptT String IO) a
 runIM :: IM a -> IntState -> IO (Either String (a,IntState))
-runIM m st = runErrorT (runStateT m st)
+runIM m st = runExceptT (runStateT m st)
 
 runProg :: Stmt -> IO ()
 runProg p = do

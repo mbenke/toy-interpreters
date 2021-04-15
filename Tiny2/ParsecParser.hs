@@ -2,7 +2,7 @@ module Tiny2.ParsecParser where
 import Tiny2.Syntax
 import Data.Functor
 import Control.Monad
-import Control.Monad.Error
+-- import Control.Monad.Error
 
 import Text.ParserCombinators.Parsec
 import qualified Text.ParserCombinators.Parsec.Token as PT
