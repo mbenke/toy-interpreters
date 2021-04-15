@@ -3,7 +3,6 @@ import Tiny1.Lexer
 import Tiny1.Syntax
 import Data.Functor
 import Control.Monad
-import Control.Monad.Error
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Pos
